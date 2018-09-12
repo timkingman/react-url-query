@@ -47,7 +47,13 @@ export default function addUrlProps(options = {}) {
       if (urlQueryConfig.history.location) {
         location = urlQueryConfig.history.location;
 
-        // react-router provides it as a prop
+        // react-router-v4 provides it as a prop
+      } else if (
+        urlQueryConfig.history.getCurrentLocation &&
+        urlQueryConfig.history.getCurrentLocation()
+      ) {
+        location = urlQueryConfig.history.getCurrentLocation();
+        // react-router-v2 provides a getter
       } else if (
         props.location &&
         (props.location.query || props.location.search != null)
@@ -135,6 +141,13 @@ export default function addUrlProps(options = {}) {
                   ] = function generatedUrlChangeHandler(value) {
                     let { location } = urlQueryConfig.history;
 
+                    if (
+                      !location &&
+                      urlQueryConfig.history.getCurrentLocation
+                    ) {
+                      location = urlQueryConfig.history.getCurrentLocation();
+                      // react-router-v2 provides a getter
+                    }
                     // for backwards compatibility
                     if (!location) {
                       location = this.props.location;
@@ -174,6 +187,11 @@ export default function addUrlProps(options = {}) {
                 updateType = UrlUpdateTypes.replaceIn
               ) {
                 let { location } = urlQueryConfig.history;
+
+                if (!location && urlQueryConfig.history.getCurrentLocation) {
+                  location = urlQueryConfig.history.getCurrentLocation();
+                  // react-router-v2 provides a getter
+                }
 
                 // for backwards compatibility
                 if (!location) {
